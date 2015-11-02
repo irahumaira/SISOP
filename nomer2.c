@@ -1,23 +1,40 @@
 #include<stdio.h>
-#include<unistd.h>
+#include<pthread.h>
 
-int prima(int angka) {
-        int i;
-        for(i=2;i<=angka/2;i++) {
-                if(angka%i==0) return 0;
-
-        }
-        return 1;
+void *prima(void *args) {
+	int i,j;
+	int n=*((int *) args);
+	for(i=2;i<=n/2;i++) {
+		printf("satu %d\n",i);
+		for(j=2;j<=i/2;j++){
+			if(i%j==0) printf("bukan prima\n");
+			break;
+		}
+	}
 }
 
-int main() {
-        int inp,i;
-        while(scanf("%d",&inp) && inp!=EOF) {
-		int count=0;
-		for(i=2;i<=inp;i++)
-  	              if(prima(i)==1) count++;
-		printf("%d\n",count);
+void *prima2(void *args) {
+       	int i,j;
+	int n=*((int *)args);
+        for(i=n/2+1;i<=n;i++) {
+		printf("dua %d\n",i);
+                for(j=2;j<=i/2;j++){
+                        if(i%j==0) printf("bukan prima\n");
+                        break;
+                }
         }
-        return 0;
+
 }
 
+void main() {
+	int inp;
+	pthread_t t1,t2;
+
+	scanf("%d",&inp);
+
+	pthread_create(&t1,NULL,&prima,&inp);
+	pthread_create(&t2,NULL,&prima2,&inp);
+
+	pthread_join(t1,NULL);
+	pthread_join(t2,NULL);
+}
