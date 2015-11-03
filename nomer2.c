@@ -1,6 +1,5 @@
 #include<stdio.h>
 #include<pthread.h>
-#include<math.h>
 
 void *prima(void *args) {
 	int i,j,n=*((int *) args),count=(n-1)/2;
