@@ -14,10 +14,12 @@ void *thread1(void *args) {
 	nfile coba = *((nfile *)args);
 
 	inp = fopen(coba.nama1,"r");
-	out = fopen(coba.nama2,"rw");
+	out = fopen(coba.nama2,"w+");
 	while(fgets(cobi,100,inp)){
             fprintf(out,"%s",cobi);
 	}
+	fclose(inp);
+	fclose(out);
 }
 
 void *thread2(void *args) {
@@ -25,16 +27,19 @@ void *thread2(void *args) {
         char cobi[100];
         nfile coba2 = *((nfile *)args);
 
-        inp2 = fopen(coba2.nama2,"rw");
+        inp2 = fopen(coba2.nama2,"r+");
         out2 = fopen(coba2.nama3,"w");
         while(fgets(cobi,100,inp2)){
             fprintf(out2,"%s",cobi);
         }
+	fclose(inp2);
+	fclose(out2);
 }
 
 void main() {
 	nfile inm;
 	FILE *file1;
+	
 	while(1) {
 		printf("nama file1 : ");
 		scanf("%s",inm.nama1);
