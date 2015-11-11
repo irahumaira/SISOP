@@ -6,12 +6,12 @@
 
 
 void  parse(char *line, char **argv) {
-	while (*line != '\0') {       // if not the end of line .......  
+	while (*line != '\0') { //if not the end of line
 		while (*line == ' ' || *line == '\t' || *line == '\n')	*line++ = '\0';
           	*argv++ = line;
 		while (*line != '\0' && *line != ' ' &&  *line != '\t' && *line != '\n') line++;
 	}
-	*argv = '\0';                 // mark the end of argument list
+	*argv = '\0'; // mark the end of argument list
 }
 
 int  exec(char **argv, int back) {
@@ -22,14 +22,12 @@ int  exec(char **argv, int back) {
 		exit(1);
      	}
    	else if (pid == 0) {
-		if (execvp(*argv, argv) < 0) {
-              	 	printf("*** ERROR: exec failed\n");
-              	 	exit(1);
-		}
+		execvp(*argv, argv);
     	}
-     	else {
-         	if(back==0) while (wait(&status) != pid);
+	else if(back==0) {
+		while (wait(&status) != pid);
 	}
+	return 1;
 }
 
 void sighandler(int signum) {
@@ -43,7 +41,7 @@ void sighandler(int signum) {
 int main() {
 	signal(SIGINT, sighandler);
 	signal(SIGTSTP, sighandler);
-	
+	int status;
 	char line[1024],*argv[64];
 	char tmp[30],ori[30];
 	while(1) 
@@ -52,21 +50,16 @@ int main() {
 	        printf("praktikum2:~ %s$ ", tmp);
 		scanf("%[^\n]",line);
 		if(getchar()==EOF) exit(1);
-		printf(">> %s\n",line);
 		
 		if(strcmp(line,"exit")!=0) {
 			if(strncmp("cd",line,2)!=0) {
+				strcpy(ori,line);
 				char *inp,*split=strtok(line,"&");
-				int count=0;
-				while(split!=NULL) {
-count++;
-				        inp=split;
-					printf("%s\n",inp);
-					split=strtok(NULL,"&");
-				}
-				printf("%d\n",count);
-				parse(line,argv);
-				exec(argv,0);
+				inp=split;			
+				printf("ori:%s line:%s\n",ori,line);
+				parse(inp,argv);
+				if(strcmp(ori,line)==0) status=exec(argv,0);
+				else continue;
 			}
 			else {
 				char *inp,*split=strtok(line," ");
@@ -79,5 +72,6 @@ count++;
 		}
 		else exit(1);
 		strcpy(line,"");
+		status=0;
 	}
 }
