@@ -14,6 +14,13 @@ void  parse(char *line, char **argv) {
 	*argv = '\0'; // mark the end of argument list
 }
 
+void sighandler(int signum) {
+	char tmp[30];
+	getcwd(tmp, sizeof(tmp));
+	printf("\npraktikum2:~ %s$ ", tmp);
+	fflush(stdout);
+}
+
 int  exec(char **argv, int back) {
      	pid_t  pid;
      	int status;
@@ -22,21 +29,16 @@ int  exec(char **argv, int back) {
 		exit(1);
      	}
    	else if (pid == 0) {
-		execvp(*argv, argv);
+		if (execvp(*argv, argv) < 0) {     /* execute the command  */
+			printf("*** ERROR: exec failed\n");
+			exit(1);
+		}
     	}
 	else if(back==0) {
 		while (wait(&status) != pid);
 	}
 	return 1;
 }
-
-void sighandler(int signum) {
-	char tmp[30];
-	getcwd(tmp, sizeof(tmp));
-	printf("\npraktikum2:~%s ", tmp);
-	fflush(stdout);
-}
-
 
 int main() {
 	signal(SIGINT, sighandler);
