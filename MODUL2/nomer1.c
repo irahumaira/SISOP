@@ -5,52 +5,42 @@
 #include <stdlib.h>
 
 
-void  parse(char *line, char **argv)
-{
-	while (*line != '\0')
-	{
-		while (*line == ' ' || *line == '\t' || *line == '\n')
-		*line++ = '\0';
-		*argv++ = line;
-		while (*line != '\0' && *line != ' ' && *line != '\t' && *line != '\n')
-		line++;
+void  parse(char *line, char **argv) {
+	while (*line != '\0') {       // if not the end of line .......  
+		while (*line == ' ' || *line == '\t' || *line == '\n')	*line++ = '\0';
+          	*argv++ = line;
+		while (*line != '\0' && *line != ' ' &&  *line != '\t' && *line != '\n') line++;
 	}
-	*argv = '\0';
+	*argv = '\0';                 // mark the end of argument list
 }
 
-int  exec(char **argv, int back) 
-{
+int  exec(char **argv, int back) {
      	pid_t  pid;
      	int status;
-     	if ((pid = fork()) < 0) 
-	{
+     	if ((pid = fork()) < 0) {
 		printf("*** ERROR: forking child process failed\n");
 		exit(1);
      	}
-   	else if (pid == 0) 
-	{
-		if (execvp(*argv, argv) < 0)
-		{
+   	else if (pid == 0) {
+		if (execvp(*argv, argv) < 0) {
               	 	printf("*** ERROR: exec failed\n");
               	 	exit(1);
 		}
     	}
-     	else
-	{
+     	else {
          	if(back==0) while (wait(&status) != pid);
 	}
 }
 
-void sighandler(int signum)
-{
+void sighandler(int signum) {
 	char tmp[30];
 	getcwd(tmp, sizeof(tmp));
 	printf("\npraktikum2:~%s ", tmp);
-//	fflush(stdout);
+	fflush(stdout);
 }
 
-int main()
-{
+
+int main() {
 	signal(SIGINT, sighandler);
 	signal(SIGTSTP, sighandler);
 	
@@ -59,29 +49,26 @@ int main()
 	while(1) 
 	{
 		getcwd(tmp, sizeof(tmp));
-	        printf("praktikum2:~ %s ", tmp);
+	        printf("praktikum2:~ %s$ ", tmp);
 		scanf("%[^\n]",line);
 		if(getchar()==EOF) exit(1);
 		printf(">> %s\n",line);
 		
-		if(strcmp(line,"exit")!=0) 
-		{
-			strcpy(ori,line);
-			char *inp[5],*split=strtok(line," ");
-			int i=-1;
-			while(split!=NULL)
-			{
-			        inp[++i]=split;
-				printf("hasil strtok(): %s\n",inp[i]);
-				split=strtok(NULL," ");
-			}
-			if(strcmp(inp[0],"cd")!=0) 
-			{			
-				parse(ori,argv);
+		if(strcmp(line,"exit")!=0) {
+			if(strncmp("cd",line,2)!=0) {
+				parse(line,argv);
 				exec(argv,0);
 			}
+			else {
+				char *inp,*split=strtok(line," ");
+				while(split!=NULL) {
+				        inp=split;
+					split=strtok(NULL," ");
+				}
+				chdir(inp);
+			}
 		}
-		else return;
+		else exit(1);
 		strcpy(line,"");
 	}
 }
