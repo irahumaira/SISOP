@@ -49,14 +49,14 @@ int main() {
 		getcwd(tmp, sizeof(tmp));
 	        printf("praktikum2:~ %s$ ", tmp);
 		scanf("%[^\n]",line);
-		if(getchar()==EOF) exit(1);
-		
+		if(getchar()==EOF) {
+			printf("\n"); exit(1);
+		}		
 		if(strcmp(line,"exit")!=0) {
 			if(strncmp("cd",line,2)!=0) {
 				strcpy(ori,line);
 				char *inp,*split=strtok(line,"&");
-				inp=split;			
-				printf("ori:%s line:%s\n",ori,line);
+				inp=split;
 				parse(inp,argv);
 				if(strcmp(ori,line)==0) status=exec(argv,0);
 				else continue;
